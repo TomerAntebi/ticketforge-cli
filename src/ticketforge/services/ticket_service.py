@@ -1,47 +1,22 @@
-from typing import Iterator, Optional, Protocol, Sequence
+from typing import Iterator, Optional, Sequence
 
+from ticketforge.client.ticket_client import TicketClient
 from ticketforge.exceptions.errors import TicketValidationError
 from ticketforge.models.api_models import Ticket, TicketPage, TicketStage
-
-
-class TicketGateway(Protocol):
-    """What the service needs from the outside world; TicketClient satisfies it."""
-
-    def fetch_ticket_page(
-        self, limit: Optional[int] = None, cursor: Optional[str] = None
-    ) -> TicketPage: ...
-
-    def get_ticket(self, ref: str) -> Ticket: ...
-
-    def create_ticket(
-        self,
-        title: str,
-        description: Optional[str] = None,
-        depends_on: Sequence[str] = (),
-    ) -> Ticket: ...
-
-    def update_ticket(
-        self,
-        ref: str,
-        title: str,
-        description: Optional[str],
-        stage: TicketStage,
-        depends_on: Sequence[str] = (),
-    ) -> Ticket: ...
 
 
 class TicketService:
     """Ticket business rules. No HTTP, no printing, no argument parsing."""
 
-    def __init__(self, gateway: TicketGateway) -> None:
-        self._gateway = gateway
+    def __init__(self, ticket_client: TicketClient) -> None:
+        self._ticket_client = ticket_client
 
     def verify_credentials(self) -> None:
         """Raise AuthenticationError if the credentials are rejected.
 
         The API has no login endpoint, so one cheap authenticated request is the check.
         """
-        self._gateway.fetch_ticket_page(limit=1)
+        self._ticket_client.fetch_ticket_page(limit=1)
 
     def iter_ticket_pages(self, limit: Optional[int] = None) -> Iterator[TicketPage]:
         """Yield pages lazily, following the API cursor until the last page.
@@ -51,7 +26,7 @@ class TicketService:
         """
         cursor: Optional[str] = None
         while True:
-            page = self._gateway.fetch_ticket_page(limit=limit, cursor=cursor)
+            page = self._ticket_client.fetch_ticket_page(limit=limit, cursor=cursor)
             yield page
             if not page.has_more or page.next_cursor is None:
                 return
@@ -61,7 +36,7 @@ class TicketService:
         clean_ref = ref.strip()
         if not clean_ref:
             raise TicketValidationError("Ticket ref cannot be empty.")
-        return self._gateway.get_ticket(clean_ref)
+        return self._ticket_client.get_ticket(clean_ref)
 
     def create_ticket(
         self,
@@ -72,7 +47,7 @@ class TicketService:
         clean_title = title.strip()
         if not clean_title:
             raise TicketValidationError("Title cannot be empty.")
-        return self._gateway.create_ticket(clean_title, description, depends_on)
+        return self._ticket_client.create_ticket(clean_title, description, depends_on)
 
     def update_ticket(
         self,
@@ -92,8 +67,8 @@ class TicketService:
         if title is not None and not title.strip():
             raise TicketValidationError("Title cannot be empty.")
 
-        current = self._gateway.get_ticket(ref)
-        return self._gateway.update_ticket(
+        current = self._ticket_client.get_ticket(ref)
+        return self._ticket_client.update_ticket(
             ref,
             title=title.strip() if title is not None else current.title,
             description=description if description is not None else current.description,

@@ -1,9 +1,8 @@
-from typing import Optional, cast
+from typing import Optional
 
 import requests
 
 from ticketforge.client.transport.api_transport import DEFAULT_TIMEOUT_SECONDS, ApiTransport
-from ticketforge.models.api_models import User, UserEnvelopePayload
 
 
 class AccountClient:
@@ -19,9 +18,8 @@ class AccountClient:
     ) -> None:
         self._transport = ApiTransport(base_url, session, timeout_seconds)
 
-    def register_user(self, username: str, password: str) -> User:
-        response = self._transport.request_with_retry(
+    def register_user(self, username: str, password: str) -> None:
+        # The response is not needed: the caller already knows the username it sent.
+        self._transport.request_with_retry(
             "POST", self._REGISTER_PATH, {"username": username, "password": password}
         )
-        payload = cast(UserEnvelopePayload, response.json())
-        return User.from_payload(payload["user"])

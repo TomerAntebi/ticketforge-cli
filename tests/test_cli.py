@@ -1,6 +1,5 @@
 """CLI tests: real argument parsing and real printing, fake API and fake config path."""
 
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Sequence
 
@@ -18,7 +17,7 @@ from ticketforge.exceptions.errors import (
     TicketForgeError,
     UsernameTakenError,
 )
-from ticketforge.models.api_models import TicketStage, User
+from ticketforge.models.api_models import TicketStage
 from ticketforge.services.ticket_service import TicketService
 
 
@@ -261,18 +260,13 @@ def test_update_prints_the_updated_ticket(
 
 
 # --- register ---------------------------------------------------------------
-def make_user(username: str) -> User:
-    return User(id="u1", username=username, created=datetime(2026, 1, 1, tzinfo=timezone.utc))
-
-
 class FakeAccountClient:
     def __init__(self, error: Optional[TicketForgeError] = None) -> None:
         self._error = error
 
-    def register_user(self, username: str, password: str) -> User:
+    def register_user(self, username: str, password: str) -> None:
         if self._error:
             raise self._error
-        return make_user(username)
 
 
 def test_register_reports_the_created_account(

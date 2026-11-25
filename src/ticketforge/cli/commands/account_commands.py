@@ -36,8 +36,8 @@ def prompt_credentials(args: argparse.Namespace) -> tuple[str, str]:
 
 def handle_register(args: argparse.Namespace, store: SettingsStore) -> None:
     username, password = prompt_credentials(args)
-    user = AccountClient(args.base_url).register_user(username, password)
-    print(f"{colorize('Account created', GREEN)} for {user.username}. Run 'ticketforge setup' to log in.")
+    AccountClient(args.base_url).register_user(username, password)
+    print(f"{colorize('Account created', GREEN)} for {username}. Run 'ticketforge setup' to log in.")
 
 
 def handle_setup(args: argparse.Namespace, store: SettingsStore) -> None:

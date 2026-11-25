@@ -50,15 +50,15 @@ On any failure the command prints `Error: ...` to stderr and exits with code `1`
 
 ## How it works
 ```
-cli/       argparse commands and terminal output (no HTTP)
-services/  ticket rules: validation, partial update, paging
-client/    TicketClient and AccountClient, plus transport (HTTP, error mapping, 429 retry)
-models/    API payload types and domain objects
-config/    saved settings
+cli/         argparse commands and terminal output (wires the layers together, no HTTP of its own)
+services/    ticket rules: validation, partial update, paging
+client/      TicketClient and AccountClient, plus transport (HTTP, error mapping, 429 retry)
+models/      API payload types and ticket objects
+config/      saved settings
+exceptions/  domain errors shared by every layer
 ```
 
-Layers depend downward only. The service talks to a `TicketGateway` protocol, so
-everything can be tested without a network.
+Layers depend downward only. Tests use in-memory fakes instead of the network.
 
 What the API taught me:
 - Most failures come back as HTTP 400. The real type is in the JSON `err` code
@@ -73,7 +73,7 @@ What the API taught me:
 pip install -e ".[dev]"
 python -m pytest -q
 ```
-82 tests cover models, error mapping, rate-limit retry, both clients, the service,
+81 tests cover models, error mapping, rate-limit retry, both clients, the service,
 settings and the CLI, with positive and negative cases. No test uses the network.
 
 ## Evidence that it runs

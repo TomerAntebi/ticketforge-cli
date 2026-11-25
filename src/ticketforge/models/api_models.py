@@ -27,11 +27,6 @@ def parse_timestamp(value: str) -> datetime:
 
 
 # --- 2. Wire types (API JSON, never used outside parsing) ---------------------
-class OwnerPayload(TypedDict):
-    id: str
-    username: str
-
-
 class WorkItemPayload(TypedDict):
     ref: str
     title: str
@@ -39,7 +34,6 @@ class WorkItemPayload(TypedDict):
     stage: str
     created: str
     updated: NotRequired[str]
-    owner: NotRequired[OwnerPayload]
     dependsOn: NotRequired[list[str]]
 
 
@@ -58,23 +52,7 @@ class WorkItemListPayload(TypedDict):
     pagination: PaginationPayload
 
 
-class UserPayload(TypedDict):
-    id: str
-    username: str
-    created: str
-
-
-class UserEnvelopePayload(TypedDict):
-    user: UserPayload
-
-
 # --- 3. Domain objects (what the app uses) ------------------------------------
-@dataclass(frozen=True)
-class Owner:
-    id: str
-    username: str
-
-
 @dataclass(frozen=True)
 class Ticket:
     ref: str
@@ -83,12 +61,10 @@ class Ticket:
     stage: TicketStage
     created: datetime
     updated: Optional[datetime] = None
-    owner: Optional[Owner] = None
     depends_on: tuple[str, ...] = field(default_factory=tuple)
 
     @classmethod
     def from_payload(cls, payload: WorkItemPayload) -> Ticket:
-        owner_payload = payload.get("owner")
         updated_value = payload.get("updated")
         return cls(
             ref=payload["ref"],
@@ -97,7 +73,6 @@ class Ticket:
             stage=TicketStage(payload["stage"]),
             created=parse_timestamp(payload["created"]),
             updated=parse_timestamp(updated_value) if updated_value else None,
-            owner=Owner(**owner_payload) if owner_payload else None,
             depends_on=tuple(payload.get("dependsOn", [])),
         )
 
@@ -108,18 +83,3 @@ class TicketPage:
     limit: int
     has_more: bool
     next_cursor: Optional[str] = None
-
-
-@dataclass(frozen=True)
-class User:
-    id: str
-    username: str
-    created: datetime
-
-    @classmethod
-    def from_payload(cls, payload: UserPayload) -> User:
-        return cls(
-            id=payload["id"],
-            username=payload["username"],
-            created=parse_timestamp(payload["created"]),
-        )

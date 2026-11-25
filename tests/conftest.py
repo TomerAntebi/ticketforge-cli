@@ -52,7 +52,6 @@ def workitem_payload(**overrides: Any) -> dict[str, Any]:
         "stage": "open",
         "created": "2026-01-01T10:00:00Z",
         "updated": "2026-01-02T10:00:00Z",
-        "owner": {"id": "u1", "username": "tomer"},
         "dependsOn": [],
     }
     payload.update(overrides)
@@ -112,7 +111,7 @@ class FakeSession:
 
 
 class FakeGateway:
-    """In-memory TicketGateway: lets service tests run without HTTP."""
+    """In-memory stand-in for TicketClient: lets service tests run without HTTP."""
 
     def __init__(
         self,
