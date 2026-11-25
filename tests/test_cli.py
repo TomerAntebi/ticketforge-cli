@@ -318,7 +318,7 @@ def test_setup_does_not_save_credentials_when_login_fails(
 
     assert run(["setup", "--username", "tomer"]) == 1
 
-    assert store.clear() is False  # nothing was written
+    assert store.delete() is False  # nothing was written
     assert "Bad login" in capsys.readouterr().err
 
 

@@ -83,7 +83,6 @@ def print_all_tickets(pages: Iterable[TicketPage]) -> None:
 
 
 def print_pages_one_at_a_time(pages: Iterable[TicketPage]) -> None:
-    # `pages` is lazy: the next request is only sent if the loop continues.
     for page in pages:
         if not page.tickets:
             print("No tickets found.")

@@ -22,7 +22,6 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def run(argv: Optional[Sequence[str]] = None) -> int:
-    # Library code only logs (e.g. rate-limit waits); the CLI decides to show it.
     logging.basicConfig(level=logging.WARNING, format="%(message)s")
     args = build_parser().parse_args(argv)
     try:

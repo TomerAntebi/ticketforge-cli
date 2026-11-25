@@ -33,10 +33,10 @@ class TicketService:
             cursor = page.next_cursor
 
     def get_ticket(self, ref: str) -> Ticket:
-        clean_ref = ref.strip()
-        if not clean_ref:
+        trimmed_ref = ref.strip()
+        if not trimmed_ref:
             raise TicketValidationError("Ticket ref cannot be empty.")
-        return self._ticket_client.get_ticket(clean_ref)
+        return self._ticket_client.get_ticket(trimmed_ref)
 
     def create_ticket(
         self,
@@ -44,10 +44,10 @@ class TicketService:
         description: Optional[str] = None,
         depends_on: Sequence[str] = (),
     ) -> Ticket:
-        clean_title = title.strip()
-        if not clean_title:
+        trimmed_title = title.strip()
+        if not trimmed_title:
             raise TicketValidationError("Title cannot be empty.")
-        return self._ticket_client.create_ticket(clean_title, description, depends_on)
+        return self._ticket_client.create_ticket(trimmed_title, description, depends_on)
 
     def update_ticket(
         self,
@@ -67,11 +67,11 @@ class TicketService:
         if title is not None and not title.strip():
             raise TicketValidationError("Title cannot be empty.")
 
-        current = self._ticket_client.get_ticket(ref)
+        existing_ticket = self._ticket_client.get_ticket(ref)
         return self._ticket_client.update_ticket(
             ref,
-            title=title.strip() if title is not None else current.title,
-            description=description if description is not None else current.description,
-            stage=stage if stage is not None else current.stage,
-            depends_on=depends_on if depends_on is not None else current.depends_on,
+            title=title.strip() if title is not None else existing_ticket.title,
+            description=description if description is not None else existing_ticket.description,
+            stage=stage if stage is not None else existing_ticket.stage,
+            depends_on=depends_on if depends_on is not None else existing_ticket.depends_on,
         )

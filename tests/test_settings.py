@@ -34,14 +34,14 @@ def test_config_file_is_readable_by_the_owner_only(store: SettingsStore, tmp_pat
 def test_delete_removes_the_file_and_reports_true(store: SettingsStore) -> None:
     store.save(SETTINGS)
 
-    assert store.clear() is True
+    assert store.delete() is True
     with pytest.raises(ConfigurationError):
         store.load()
 
 
 # --- Negative ---------------------------------------------------------------
 def test_delete_with_nothing_saved_returns_false(store: SettingsStore) -> None:
-    assert store.clear() is False
+    assert store.delete() is False
 
 
 def test_load_before_setup_asks_the_user_to_run_setup(store: SettingsStore) -> None:

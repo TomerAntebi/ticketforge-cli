@@ -36,8 +36,6 @@ class TicketClient:
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> TicketPage:
-        # The API paginates with an opaque "timestamp:id" cursor returned as
-        # pagination.nextCursor; offset/page parameters are silently ignored.
         query: dict[str, object] = {}
         if limit is not None:
             query["limit"] = limit
@@ -54,7 +52,6 @@ class TicketClient:
         )
 
     def get_ticket(self, ref: str) -> Ticket:
-        # Only this endpoint returns dependsOn; the list endpoint omits it.
         response = self._transport.request_with_retry("GET", self._WORKITEM_PATH.format(ref=ref))
         return self._parse_ticket(response)
 
@@ -80,9 +77,6 @@ class TicketClient:
         stage: TicketStage,
         depends_on: Sequence[str] = (),
     ) -> Ticket:
-        # PUT needs the full body: the API rejects partial updates (title and a
-        # valid stage are always required), so callers must send current values.
-        # Custom fields are not modeled by this CLI, so an empty object is sent.
         body: dict[str, object] = {
             "title": title,
             "description": description,

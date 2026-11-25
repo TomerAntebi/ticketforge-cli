@@ -54,7 +54,7 @@ def handle_whoami(args: argparse.Namespace, store: SettingsStore) -> None:
 
 
 def handle_logout(args: argparse.Namespace, store: SettingsStore) -> None:
-    if store.clear():
+    if store.delete():
         print(f"{colorize('Logged out', GREEN)}. Saved credentials removed.")
     else:
         print("You are not logged in.")

@@ -22,7 +22,6 @@ class SettingsStore:
     """Persists connection settings. No HTTP: validating credentials is the setup flow's job."""
 
     def __init__(self, config_path: Path = DEFAULT_CONFIG_PATH) -> None:
-        # Injectable so tests use a temp path instead of the real home directory.
         self._config_path = config_path
 
     def save(self, settings: Settings) -> None:
@@ -39,7 +38,7 @@ class SettingsStore:
         with os.fdopen(file_descriptor, "w", encoding="utf-8") as config_file:
             json.dump(asdict(settings), config_file)
 
-    def clear(self) -> bool:
+    def delete(self) -> bool:
         """Remove saved credentials. Returns False when nothing was saved."""
         try:
             self._config_path.unlink()

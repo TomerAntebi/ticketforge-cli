@@ -14,12 +14,13 @@ the web app's network requests.
 - Colored table output (plain text when piped, or when `NO_COLOR` is set)
 
 ## Install
-Requires Python 3.11 or newer.
+Requires Python 3.11 or newer. Check with `python3 --version`; if it is older, use a newer
+interpreter instead, for example `python3.12 -m venv .venv`.
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .          # use ".[dev]" to also install pytest
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -e .                 # use ".[dev]" to also install pytest
 ```
 
 This installs the `ticketforge` command.
